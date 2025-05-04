@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Balance Details - Cyber Bank</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-image: url('1619052.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            overflow: hidden;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: rgba(0,0,0,0.7);
+        }
+        .header {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 1rem 2rem;
+            box-shadow: 0 0 15px rgba(0,123,255,0.7);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 20;
+        }
+        .header .user-info {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .header .user-info span {
+            background: rgba(0, 123, 255, 0.5);
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            box-shadow: 0 0 8px #007bff;
+        }
+        .header .time {
+            font-weight: 400;
+            font-size: 1rem;
+            color: #cce4ff;
+        }
+        main {
+            margin-top: 5rem;
+            flex-grow: 1;
+            padding: 2rem 3rem;
+            background: rgba(0, 0, 0, 0.75);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 123, 255, 0.7);
+            max-width: 900px;
+            width: 90%;
+            overflow-y: auto;
+        }
+        h1 {
+            font-weight: 900;
+            font-size: 2rem;
+            color: #66b2ff;
+            text-align: center;
+            text-shadow: 0 0 10px #007bff;
+            margin-bottom: 1.5rem;
+        }
+        .balance-summary {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #66ff99;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px #33cc66;
+        }
+        .balance-details {
+            display: flex;
+            justify-content: space-around;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .balance-box {
+            background: rgba(54, 162, 235, 0.3);
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            flex: 1 1 250px;
+            box-shadow: 0 0 15px rgba(54, 162, 235, 0.7);
+            text-align: center;
+        }
+        .balance-box h2 {
+            margin-bottom: 1rem;
+            color: #99ccff;
+            text-shadow: 0 0 8px #007bff;
+        }
+        .balance-box p {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .back-link {
+            display: block;
+            margin: 2rem auto 0 auto;
+            width: max-content;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.6);
+            transition: background 0.4s, box-shadow 0.4s;
+        }
+        .back-link:hover {
+            background: linear-gradient(45deg, #0056b3, #003d7a);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.9);
+        }
+    </style>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const dateString = now.toLocaleDateString();
+            document.getElementById('time').innerText = `${timeString} - ${dateString}`;
+        }
+        setInterval(updateTime, 1000);
+
+        function generateRandomBalance() {
+            return (Math.random() * 10000).toFixed(2);
+        }
+        function generateRandomAccountNumber() {
+            return 'AC' + Math.floor(100000000 + Math.random() * 900000000);
+        }
+        window.onload = function() {
+            const username = localStorage.getItem('username') || 'Guest';
+            document.getElementById('username-display').innerText = username;
+            document.getElementById('account-number').innerText = generateRandomAccountNumber();
+            updateTime();
+
+            // Populate balance summary and details
+            const balance = generateRandomBalance();
+            document.getElementById('balance-summary').innerText = `$${balance}`;
+            document.getElementById('checking-balance').innerText = `$${(balance * 0.6).toFixed(2)}`;
+            document.getElementById('savings-balance').innerText = `$${(balance * 0.3).toFixed(2)}`;
+            document.getElementById('investment-balance').innerText = `$${(balance * 0.1).toFixed(2)}`;
+        };
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            <span id="username-display">Username</span>
+            <span id="account-number">AC123456789</span>
+        </div>
+        <div class="time" id="time">--:--:-- --/--/----</div>
+    </div>
+    <main>
+        <h1>Balance Details</h1>
+        <div class="balance-summary" id="balance-summary">$0.00</div>
+        <div class="balance-details">
+            <div class="balance-box">
+                <h2>Checking Account</h2>
+                <p id="checking-balance">$0.00</p>
+            </div>
+            <div class="balance-box">
+                <h2>Savings Account</h2>
+                <p id="savings-balance">$0.00</p>
+            </div>
+            <div class="balance-box">
+                <h2>Investment Account</h2>
+                <p id="investment-balance">$0.00</p>
+            </div>
+        </div>
+        <a href="transaction.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </main>
+</body>
+</html>

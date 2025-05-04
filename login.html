@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cyber Bank Login</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-image: url('1619052.jpg');
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        overflow: hidden;
+      }
+      .login-container {
+        background-color: rgba(0, 0, 0, 0.85);
+        padding: 2.5rem 3rem;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0, 123, 255, 0.7);
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        animation: fadeIn 1s ease forwards;
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      @keyframes fadeIn {
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .input-group {
+        position: relative;
+        margin-bottom: 1.8rem;
+      }
+      .input-group input,
+      .input-group select {
+        width: calc(100% - 40px);
+        padding: 12px 20px;
+        border: 1px solid #007bff;
+        border-radius: 8px;
+        background-color: #222;
+        color: white;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+      .input-group input:focus,
+      .input-group select:focus {
+        outline: none;
+        border-color: #66b2ff;
+        box-shadow: 0 0 8px #66b2ff;
+        background-color: #111;
+      }
+      .input-group i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #66b2ff;
+        font-size: 1.2rem;
+      }
+      .login-btn {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1.1rem;
+        font-weight: 700;
+        transition: background 0.4s, box-shadow 0.4s;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.6);
+      }
+      .login-btn:hover {
+        background: linear-gradient(45deg, #0056b3, #003d7a);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.9);
+      }
+      h2 {
+        margin-bottom: 1.5rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px #007bff;
+      }
+      .welcome-text {
+        margin-top: 1.2rem;
+        font-size: 1rem;
+      }
+      #time {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 1.3rem;
+        color: white;
+        text-shadow: 0 0 5px black;
+      }
+      .bank-details {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #ccc;
+        text-align: left;
+        line-height: 1.4;
+      }
+      .bank-details a {
+        color: #66b2ff;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+      .bank-details a:hover {
+        color: #99ccff;
+        text-decoration: underline;
+      }
+      .logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 0 15px #007bff;
+      }
+      .logo img {
+        width: 100%;
+        height: auto;
+      }
+    </style>
+    <script>
+      function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        const dateString = now.toLocaleDateString();
+        document.getElementById('time').innerText = `${timeString} - ${dateString}`;
+      }
+      setInterval(updateTime, 1000);
+
+      let step = 1;
+
+      function submitLogin(event) {
+        event.preventDefault();
+        if (step === 1) {
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+
+          fetch('login.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                localStorage.setItem('username', username); // Store username in localStorage
+                window.location.href = 'transaction.html'; // Redirect to transaction page on success
+              } else if (data.require_security_questions) {
+                // Show security questions form
+                showSecurityQuestions();
+                step = 2;
+              } else {
+                alert(data.message);
+              }
+            })
+            .catch((error) => console.error('Error:', error));
+        } else if (step === 2) {
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const securityAnswers = [];
+          for (let i = 1; i <= 10; i++) {
+            const val = document.getElementById('security_answer_' + i).value.trim();
+            securityAnswers.push(val);
+          }
+
+          fetch('login.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password, security_answers: securityAnswers }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                localStorage.setItem('username', username); // Store username in localStorage
+                window.location.href = 'dashboard.html'; // Redirect to dashboard on success
+              } else {
+                alert(data.message);
+              }
+            })
+            .catch((error) => console.error('Error:', error));
+        }
+      }
+
+      function showSecurityQuestions() {
+        const form = document.querySelector('form');
+        const securityDiv = document.createElement('div');
+        securityDiv.id = 'security-questions';
+        securityDiv.innerHTML = `
+                <h3>Security Questions</h3>
+                <p>Please answer the following 10 security questions:</p>
+                ${[...Array(10)]
+                  .map(
+                    (_, i) => `
+                    <div class="input-group">
+                        <label for="security_answer_${i + 1}">Security Answer ${i + 1}</label>
+                        <input id="security_answer_${i + 1}" name="security_answer_${i + 1}" type="text" required />
+                    </div>
+                `
+                  )
+                  .join('')}
+            `;
+        form.insertBefore(securityDiv, form.querySelector('button'));
+      }
+    </script>
+  </head>
+  <body>
+    <div id="time"></div>
+    <div class="login-container">
+      <h2 class="text-3xl font-extrabold">Cyber Bank</h2>
+      <form onsubmit="submitLogin(event)">
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input
+            class="w-full"
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+            type="text"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input
+            class="w-full"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            type="password"
+            required
+          />
+        </div>
+        <button class="login-btn" type="submit">Login</button>
+        <p class="welcome-text">
+          Don't have an account?
+          <a href="register.html" class="text-blue-400 hover:underline"
+            >Register</a
+          >
+        </p>
+      </form>
+      <p class="bank-details">
+        At Cyber Bank, we cherish your trust and prioritize your security. Join
+        us in a journey of financial empowerment! We offer a range of services
+        including savings accounts, loans, and investment opportunities tailored
+        to meet your financial needs. Our commitment to security ensures that
+        your information is protected at all times.
+      </p>
+      <p class="bank-details">
+        For more details about our services,
+        <a href="bank_details.html" class="text-blue-400 hover:underline"
+          >click here</a
+        >.
+      </p>
+      <div class="logo">
+        <img src="6783360.png" alt="Cybersecurity Logo" />
+      </div>
+    </div>
+  </body>
+</html>

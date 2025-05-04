@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - Cyber Bank</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-image: url('1619052.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            overflow: hidden; /* changed to remove vertical scrolling */
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* changed to remove vertical scrolling */
+            flex-wrap: nowrap;
+            min-width: 320px;
+        }
+        /* Left sidebar */
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background: linear-gradient(180deg, #001f3f, #003366);
+            box-shadow: 0 0 20px #007bff;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem 0;
+            overflow-y: auto;
+            transition: background 0.5s ease;
+            border-radius: 0 15px 15px 0;
+            flex-shrink: 0;
+        }
+        .sidebar button {
+            background: transparent;
+            border: none;
+            color: #99ccff;
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: background 0.4s, border-color 0.4s, color 0.4s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 0 10px 10px 0;
+        }
+        .sidebar button:hover,
+        .sidebar button.active {
+            background: rgba(0, 123, 255, 0.5);
+            border-left: 6px solid #00aaff;
+            color: #aaddff;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00aaff;
+        }
+        /* Middle ads/details section */
+        .middle-section {
+            width: 25vw;
+            min-width: 280px;
+            max-width: 320px;
+            background: linear-gradient(135deg, #00264d, #004080);
+            margin: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 0 40px #0099ff;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            font-size: 1rem;
+            border: 1px solid #00aaff;
+            animation: glowPulse 3s infinite alternate;
+            flex-shrink: 0;
+        }
+        .middle-section h2 {
+            color: #99ccff;
+            text-align: center;
+            margin: 0 0 0.7rem 0;
+            text-shadow: 0 0 15px #00aaff;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+        }
+        .ad-box {
+            background: rgba(0, 170, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 0 20px #00aaff;
+            font-size: 1.1rem;
+            transition: background 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .ad-box:hover {
+            background: rgba(0, 170, 255, 0.6);
+            box-shadow: 0 0 30px #00ccff;
+            transform: scale(1.05);
+        }
+        /* Main content area */
+        .main-content {
+            flex-grow: 1;
+            background: linear-gradient(135deg, #001a33, #003366);
+            margin: 1rem 0 1rem 0;
+            border-radius: 15px;
+            box-shadow: 0 0 40px #00aaff;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            border: 1px solid #00aaff;
+            animation: fadeInUp 1s ease forwards;
+            min-width: 0;
+            max-width: calc(100vw - 580px);
+        }
+        .main-content.hidden {
+            opacity: 0;
+            transform: translateX(50px);
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        h1, h2 {
+            margin: 0;
+        }
+        /* Section titles */
+        .section-title {
+            font-weight: 800;
+            font-size: 1.6rem;
+            margin-bottom: 1.2rem;
+            color: #99ddff;
+            text-shadow: 0 0 12px #00aaff;
+            text-align: center;
+            letter-spacing: 1.2px;
+        }
+        /* Balance section */
+        #balance-section {
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #66ff99;
+            text-shadow: 0 0 12px #33cc66;
+        }
+        /* Send money form */
+        #send-money-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        #send-money-form label {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #cceeff;
+            text-shadow: 0 0 6px #00aaff;
+        }
+        #send-money-form input[type="text"],
+        #send-money-form input[type="number"] {
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid #00aaff;
+            background-color: #111;
+            color: white;
+            font-size: 1.1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #send-money-form input[type="text"]:focus,
+        #send-money-form input[type="number"]:focus {
+            outline: none;
+            border-color: #66ccff;
+            box-shadow: 0 0 12px #66ccff;
+            background-color: #000;
+        }
+        #send-money-form button {
+            background: linear-gradient(45deg, #00aaff, #0077cc);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transition: background 0.4s, box-shadow 0.4s;
+            box-shadow: 0 5px 20px rgba(0, 170, 255, 0.7);
+        }
+        #send-money-form button:hover {
+            background: linear-gradient(45deg, #0077cc, #004f7a);
+            box-shadow: 0 7px 25px rgba(0, 170, 255, 1);
+            transform: scale(1.05);
+        }
+        /* Transaction history */
+        #transaction-history table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #cceeff;
+            font-size: 1.1rem;
+        }
+        #transaction-history th, #transaction-history td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #00aaff;
+            text-align: left;
+        }
+        #transaction-history th {
+            background-color: rgba(0, 170, 255, 0.3);
+        }
+        /* Trading section */
+        .trading-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #00aaff;
+            color: #99ccff;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .trading-item:last-child {
+            border-bottom: none;
+        }
+        /* Pie chart container */
+        .pie-chart-container {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        /* Loan details */
+        .loan-details p {
+            margin: 0.4rem 0;
+            font-size: 1.1rem;
+            color: #cceeff;
+        }
+        /* User info header */
+        .header {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 1rem 2rem;
+            box-shadow: 0 0 20px #00aaff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: 1.2px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 30;
+        }
+        .header .user-info {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+        }
+        .header .user-info span {
+            background: linear-gradient(45deg, #00aaff, #0077cc);
+            padding: 0.4rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 0 12px #00aaff;
+        }
+        .header .time {
+            font-weight: 400;
+            font-size: 1.1rem;
+            color: #cceeff;
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,170,255,0.8);
+            border-radius: 6px;
+        }
+        /* Animations */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 0 10px #00aaff;
+            }
+            100% {
+                box-shadow: 0 0 30px #00ccff;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Time update
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const dateString = now.toLocaleDateString();
+            document.getElementById('time').innerText = `${timeString} - ${dateString}`;
+        }
+        setInterval(updateTime, 1000);
+
+        // Random data generators
+        function generateRandomAccountNumber() {
+            return 'AC' + Math.floor(100000000 + Math.random() * 900000000);
+        }
+        function generateRandomBalance() {
+            return (Math.random() * 10000).toFixed(2);
+        }
+        function generateRandomTransactions() {
+            const transactions = [];
+            const types = ['Sent', 'Received', 'Deposit', 'Withdrawal'];
+            for (let i = 0; i < 10; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const amount = (Math.random() * 1000).toFixed(2);
+                const date = new Date(Date.now() - Math.random() * 1e10).toLocaleDateString();
+                transactions.push({ type, amount, date });
+            }
+            return transactions;
+        }
+        function generateRandomTradingData() {
+            return [
+                { name: 'Stock A', value: (Math.random() * 1000).toFixed(2) },
+                { name: 'Stock B', value: (Math.random() * 1000).toFixed(2) },
+                { name: 'Stock C', value: (Math.random() * 1000).toFixed(2) },
+                { name: 'Stock D', value: (Math.random() * 1000).toFixed(2) },
+            ];
+        }
+
+        // Populate sections with random data
+        function populateBalance() {
+            const balance = generateRandomBalance();
+            document.getElementById('balance-amount').innerText = `$${balance}`;
+        }
+        function populateTransactionHistory() {
+            const transactions = generateRandomTransactions();
+            const tbody = document.getElementById('transaction-tbody');
+            tbody.innerHTML = '';
+            transactions.forEach(tx => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${tx.date}</td>
+                    <td>${tx.type}</td>
+                    <td>$${tx.amount}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        function populateTradingSection() {
+        }
+
+        // Render pie chart for portfolio
+        let pieChartInstance = null;
+        function renderPieChart() {
+        }
+
+        // Populate loan details with random values
+        function populateLoanDetails() {
+        }
+
+        // Populate bank details in middle section
+        function populateBankDetails() {
+            const bankDetails = [
+                "Secure your funds with competitive interest rates.",
+                "Flexible loan options tailored to your needs.",
+                "Explore various investment plans to grow your wealth.",
+                "Advanced encryption protocols to protect your data.",
+                "Two-factor authentication for extra security.",
+                "24/7 monitoring of accounts for suspicious activity."
+            ];
+            const container = document.getElementById('bank-details-list');
+            container.innerHTML = '';
+            bankDetails.forEach(detail => {
+                const p = document.createElement('p');
+                p.innerText = detail;
+                container.appendChild(p);
+            });
+        }
+
+        // Populate ads in middle section
+        function populateAds() {
+            const ads = [
+                "Get 5% cashback on all credit card purchases!",
+                "Apply for a personal loan with low interest rates.",
+                "Invest in our new mutual fund schemes today.",
+                "Exclusive offer: Zero fees for first 6 months.",
+                "Secure your future with our retirement plans."
+            ];
+            const container = document.getElementById('ads-list');
+            container.innerHTML = '';
+            ads.forEach(ad => {
+                const div = document.createElement('div');
+                div.className = 'ad-box';
+                div.innerText = ad;
+                container.appendChild(div);
+            });
+        }
+
+        // Show selected section and hide others with transition
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.main-content > section');
+            sections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+            // Update active button
+            const buttons = document.querySelectorAll('.sidebar button');
+            buttons.forEach(btn => {
+                if (btn.dataset.section === sectionId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            // Render pie chart if portfolio section is shown
+            if (sectionId === 'portfolio-section') {
+                renderPieChart();
+            }
+        }
+
+        // Send money form submission
+        function sendMoney(event) {
+            event.preventDefault();
+            const recipient = document.getElementById('recipient').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            if (!recipient || !amount || isNaN(amount) || Number(amount) <= 0) {
+                alert('Please enter a valid recipient and amount.');
+                return;
+            }
+            alert(`Successfully sent $${amount} to account ${recipient}.`);
+            document.getElementById('send-money-form').reset();
+        }
+
+        window.onload = function() {
+            const username = localStorage.getItem('username') || 'Guest';
+            document.getElementById('username-display').innerText = username;
+            document.getElementById('account-number').innerText = generateRandomAccountNumber();
+            updateTime();
+            populateBalance();
+            populateTransactionHistory();
+            populateBankDetails();
+            populateAds();
+            showSection('balance-section');
+        };
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            <span id="username-display">Username</span>
+            <span id="account-number">AC123456789</span>
+        </div>
+        <div class="time" id="time">--:--:-- --/--/----</div>
+    </div>
+    <div class="sidebar">
+        <button onclick="window.location.href='balance.html'"><i class="fas fa-wallet"></i> Balance</button>
+        <button onclick="window.location.href='send_money.html'"><i class="fas fa-paper-plane"></i> Send Money</button>
+        <button onclick="window.location.href='transactions.html'"><i class="fas fa-history"></i> Transactions</button>
+        <button onclick="window.location.href='trading.html'"><i class="fas fa-chart-line"></i> Trading</button>
+        <button onclick="window.location.href='portfolio.html'"><i class="fas fa-chart-pie"></i> Portfolio</button>
+        <button onclick="window.location.href='loans.html'"><i class="fas fa-file-invoice-dollar"></i> Loans</button>
+        <button onclick="window.location.href='bank_details.html'"><i class="fas fa-university"></i> Bank Details</button>
+    </div>
+    <div class="middle-section">
+        <h2>Cyber Security Bank Highlights</h2>
+        <div id="bank-details-list" style="padding-right: 8px; overflow-y: visible;">
+            <p>Secure your funds with competitive interest rates.</p>
+            <p>Flexible loan options tailored to your needs.</p>
+            <p>Explore various investment plans to grow your wealth.</p>
+            <p>Advanced encryption protocols to protect your data.</p>
+            <p>Two-factor authentication for extra security.</p>
+            <p>24/7 monitoring of accounts for suspicious activity.</p>
+        </div>
+        <h2>Special Offers</h2>
+        <div id="ads-list" style="padding-right: 8px; overflow-y: visible;">
+            <div class="ad-box">Get 5% cashback on all credit card purchases!</div>
+            <div class="ad-box">Apply for a personal loan with low interest rates.</div>
+            <div class="ad-box">Invest in our new mutual fund schemes today.</div>
+            <div class="ad-box">Exclusive offer: Zero fees for first 6 months.</div>
+            <div class="ad-box">Secure your future with our retirement plans.</div>
+        </div>
+    </div>
+    <div class="main-content">
+        <section id="balance-section">
+            <img src="Pratt-Whitney-to-Open-India-Engineering-Center-in-2023-in-Bengaluru-India.jpg" alt="Bank Image" style="width: 100%; height: auto; border-radius: 15px; box-shadow: 0 0 20px #00aaff;" />
+        </section>
+        <section id="cybersecurity-overview-section">
+            <h1 class="section-title">Cybersecurity in the Banking Sector – A Detailed Overview</h1>
+            <div style="overflow-y: auto; max-height: 70vh; padding-right: 1rem;">
+                <h2>1. Introduction</h2>
+                <p>The banking sector is the backbone of any economy, handling massive volumes of financial transactions and storing critical customer data. As banks transition to digital platforms, they become highly vulnerable to cyber threats such as phishing, ransomware, identity theft, and data breaches. Cybersecurity, therefore, becomes not just a technical necessity but a strategic priority to ensure operational stability and customer trust.</p>
+                <h2>2. Importance of Cybersecurity in Banking</h2>
+                <ul>
+                    <li><strong>Protecting Customer Data:</strong> Banks store highly sensitive information such as account numbers, social security numbers, and financial transactions. A single breach can lead to identity theft and financial loss.</li>
+                    <li><strong>Ensuring Financial Stability:</strong> Cyberattacks on financial institutions can disrupt the economy, as seen in incidents like SWIFT network attacks.</li>
+                    <li><strong>Building Customer Trust:</strong> A bank's reputation is closely tied to how secure its systems are. Cybersecurity ensures customers feel safe while transacting online.</li>
+                    <li><strong>Regulatory Compliance:</strong> Compliance with laws like RBI guidelines (in India), GDPR (Europe), and GLBA (USA) is mandatory, requiring strict cybersecurity practices.</li>
+                </ul>
+                <h2>3. Common Cyber Threats in Banking</h2>
+                <ul>
+                    <li><strong>Phishing and Social Engineering:</strong> Attackers impersonate banks via emails or messages to steal login credentials.</li>
+                    <li><strong>Ransomware:</strong> Malware that locks systems until a ransom is paid, often crippling banking operations.</li>
+                    <li><strong>Data Breaches:</strong> Unauthorized access to customer or bank data, often sold on the dark web.</li>
+                    <li><strong>ATM Malware Attacks:</strong> Targeted malware inserted into ATMs to extract money or steal card data.</li>
+                    <li><strong>Insider Threats:</strong> Employees misusing access for malicious purposes.</li>
+                </ul>
+                <h2>4. Security Technologies Used in Banking</h2>
+                <ul>
+                    <li><strong>Multi-Factor Authentication (MFA):</strong> Adds a second layer of verification for secure login.</li>
+                    <li><strong>Encryption:</strong> Protects data in transit and at rest using algorithms like AES and RSA.</li>
+                    <li><strong>Firewalls and Intrusion Detection Systems (IDS):</strong> Monitor and block unauthorized access.</li>
+                    <li><strong>Secure Socket Layer (SSL)/Transport Layer Security (TLS):</strong> Ensures safe data transmission.</li>
+                    <li><strong>Behavioral Analytics:</strong> Detects anomalies in transaction patterns using AI/ML to spot fraud.</li>
+                </ul>
+                <h2>5. Regulatory and Legal Framework</h2>
+                <ul>
+                    <li><strong>Reserve Bank of India (RBI) Guidelines:</strong> Indian banks must comply with cybersecurity circulars like the “Cyber Security Framework in Banks (2016).”</li>
+                    <li><strong>Basel III Accord:</strong> Includes operational risk management.</li>
+                    <li><strong>ISO/IEC 27001:</strong> International standard for Information Security Management Systems.</li>
+                    <li><strong>Payment Card Industry Data Security Standard (PCI-DSS):</strong> For secure handling of cardholder data.</li>
+                </ul>
+                <h2>6. Incident Response and Disaster Recovery</h2>
+                <p>Banks must have a well-defined <strong>Incident Response Plan (IRP)</strong> that includes identification, containment, eradication, recovery, and lessons learned.</p>
+                <p><strong>Disaster Recovery Plans (DRP)</strong> ensure business continuity during and after a cyberattack.</p>
+                <h2>7. Emerging Trends and Technologies</h2>
+                <ul>
+                    <li><strong>Artificial Intelligence & Machine Learning:</strong> Used for fraud detection and behavioral analysis.</li>
+                    <li><strong>Blockchain Technology:</strong> Enhances security and transparency in transactions.</li>
+                    <li><strong>Zero Trust Architecture:</strong> Never trust, always verify—minimizes the risk of internal and external threats.</li>
+                    <li><strong>Biometric Security:</strong> Fingerprint, iris, and facial recognition technologies are now being used for secure authentication.</li>
+                </ul>
+                <h2>8. Employee Awareness and Training</h2>
+                <p>Employees are the first line of defense. Regular cybersecurity awareness programs reduce the chances of social engineering attacks and help maintain a security-first culture.</p>
+                <h2>9. Real-World Case Studies</h2>
+                <ul>
+                    <li><strong>Bangladesh Bank Heist (2016):</strong> Hackers stole $81 million using SWIFT network vulnerability.</li>
+                    <li><strong>Capital One Breach (2019):</strong> A misconfigured firewall led to a massive data breach affecting 100 million customers.</li>
+                </ul>
+                <h2>10. Conclusion</h2>
+                <p>Cybersecurity in the banking sector is a continuous process that evolves with technology and threats. Banks must adopt a proactive, layered security approach that includes advanced technologies, strict policies, and trained personnel. In an age where digital trust equals customer loyalty, robust cybersecurity is no longer optional—it is foundational.</p>
+            </div>
+        </section>
+        <section id="bank-details-section" class="hidden">
+            <h1 class="section-title"><i class="fas fa-university"></i> Bank Details</h1>
+            <p><strong>Establishments:</strong> Cyber Bank has multiple branches across the country, providing accessible banking services to all customers.</p>
+            <p><strong>Bank Owners:</strong> Owned and operated by Cyber Financial Group, committed to secure and innovative banking solutions.</p>
+            <p><strong>Location:</strong> Headquarters located at 123 Cyber Lane, Tech City, Country.</p>
+            <p><strong>Contact:</strong> Email: support@cyberbank.com | Phone: +1-800-555-1234</p>
+            <p><strong>Security:</strong> We employ advanced encryption, two-factor authentication, and 24/7 monitoring to protect your assets.</p>
+            <p><strong>CEO:</strong> Jane Doe, a visionary leader with 20 years of experience in banking and cybersecurity.</p>
+            <p><strong>Company Branches:</strong> Over 50 branches nationwide, including major cities and regional hubs.</p>
+            <p><strong>Security Measures:</strong> State-of-the-art cybersecurity infrastructure, regular audits, and compliance with international standards.</p>
+            <p><strong>Additional Details:</strong> Committed to customer privacy, innovative financial products, and community engagement programs.</p>
+        </section>
+    </div>
+    <script>
+        // Sidebar button click event
+        document.querySelectorAll('.sidebar button').forEach(button => {
+            button.addEventListener('click', () => {
+                showSection(button.dataset.section);
+            });
+        });
+    </script>
+</body>
+</html>

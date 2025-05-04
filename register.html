@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cyber Bank Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            background-image: url('1619052.jpg');
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+        }
+        .register-container {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 2.5rem 3rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 123, 255, 0.7);
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            overflow-y: auto;
+            max-height: 90vh;
+            animation: fadeIn 1s ease forwards;
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-group {
+            flex: 1;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+            font-size: 1rem;
+            text-shadow: 0 0 5px #007bff;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #007bff;
+            background-color: #222;
+            color: white;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #66b2ff;
+            outline: none;
+            box-shadow: 0 0 8px #66b2ff;
+            background-color: #111;
+        }
+        .register-btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: background 0.4s, box-shadow 0.4s;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.6);
+            margin-top: 1.5rem;
+        }
+        .register-btn:hover {
+            background: linear-gradient(45deg, #0056b3, #003d7a);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.9);
+        }
+        h2 {
+            margin-bottom: 1.8rem;
+            font-weight: 900;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px #007bff;
+        }
+        h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-shadow: 0 0 8px #007bff;
+        }
+        p {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .login-link {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .login-link a {
+            color: #66b2ff;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 700;
+        }
+        .login-link a:hover {
+            color: #99ccff;
+            text-decoration: underline;
+        }
+        .error-message {
+            color: #ff4d4d;
+            margin-bottom: 1rem;
+        }
+        .security-questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .security-questions-grid .input-group label {
+            font-weight: 700;
+            font-size: 1rem;
+            text-shadow: 0 0 5px #007bff;
+        }
+    </style>
+    <script>
+        async function submitRegistration(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const securityAnswers = [];
+            for (let i = 1; i <= 10; i++) {
+                const val = document.getElementById('security_answer_' + i).value.trim();
+                securityAnswers.push(val);
+            }
+
+            if (!username || !password || securityAnswers.some(ans => ans === '')) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            const response = await fetch('register.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, security_answers: securityAnswers })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Registration successful! You can now login.');
+                window.location.href = 'login.html';
+            } else {
+                alert('Registration failed: ' + data.message);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Cyber Bank Registration</h2>
+        <form onsubmit="submitRegistration(event)">
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" type="text" placeholder="Enter your username" required />
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" placeholder="Enter your password" required />
+                </div>
+            </div>
+            <h3>Security Questions</h3>
+            <p>Please answer the following 10 security questions:</p>
+            <div class="security-questions-grid">
+                <div class="input-group">
+                    <label for="security_answer_1">What was the name of your first pet?</label>
+                    <input id="security_answer_1" name="security_answer_1" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_2">What is your mother's maiden name?</label>
+                    <input id="security_answer_2" name="security_answer_2" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_3">What was the make of your first car?</label>
+                    <input id="security_answer_3" name="security_answer_3" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_4">What city were you born in?</label>
+                    <input id="security_answer_4" name="security_answer_4" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_5">What is your favorite food?</label>
+                    <input id="security_answer_5" name="security_answer_5" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_6">What was the name of your elementary school?</label>
+                    <input id="security_answer_6" name="security_answer_6" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_7">What is your favorite color?</label>
+                    <input id="security_answer_7" name="security_answer_7" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_8">What is your father's middle name?</label>
+                    <input id="security_answer_8" name="security_answer_8" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_9">What was your childhood nickname?</label>
+                    <input id="security_answer_9" name="security_answer_9" type="text" required />
+                </div>
+                <div class="input-group">
+                    <label for="security_answer_10">What is the name of your favorite teacher?</label>
+                    <input id="security_answer_10" name="security_answer_10" type="text" required />
+                </div>
+            </div>
+            <button class="register-btn" type="submit">Register</button>
+        </form>
+        <p class="login-link">Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Send Money - Cyber Bank</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-image: url('1619052.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 1rem 2rem;
+            box-shadow: 0 0 20px #00aaff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: 1.2px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 30;
+            color: #cceeff;
+        }
+        .header .user-info {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+        }
+        .header .user-info span {
+            background: linear-gradient(45deg, #00aaff, #0077cc);
+            padding: 0.4rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 0 12px #00aaff;
+        }
+        .header .time {
+            font-weight: 400;
+            font-size: 1.1rem;
+            color: #cceeff;
+        }
+        main {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 6rem;
+            padding-bottom: 2rem;
+        }
+        #send-money-form {
+            background: linear-gradient(135deg, #001a33, #003366);
+            padding: 2rem 3rem;
+            border-radius: 15px;
+            box-shadow: 0 0 40px #00aaff;
+            max-width: 420px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            border: 1px solid #00aaff;
+        }
+        #send-money-form h1 {
+            margin: 0 0 1rem 0;
+            color: #99ddff;
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 15px #00aaff;
+        }
+        #send-money-form label {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #cceeff;
+            text-shadow: 0 0 6px #00aaff;
+        }
+        #send-money-form input[type="text"],
+        #send-money-form input[type="number"] {
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid #00aaff;
+            background-color: #111;
+            color: white;
+            font-size: 1.1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #send-money-form input[type="text"]:focus,
+        #send-money-form input[type="number"]:focus {
+            outline: none;
+            border-color: #66ccff;
+            box-shadow: 0 0 12px #66ccff;
+            background-color: #000;
+        }
+        #send-money-form button {
+            background: linear-gradient(45deg, #00aaff, #0077cc);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transition: background 0.4s, box-shadow 0.4s;
+            box-shadow: 0 5px 20px rgba(0, 170, 255, 0.7);
+        }
+        #send-money-form button:hover {
+            background: linear-gradient(45deg, #0077cc, #004f7a);
+            box-shadow: 0 7px 25px rgba(0, 170, 255, 1);
+            transform: scale(1.05);
+        }
+    </style>
+    <script>
+        // Time update
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const dateString = now.toLocaleDateString();
+            document.getElementById('time').innerText = `${timeString} - ${dateString}`;
+        }
+        setInterval(updateTime, 1000);
+
+        let securityQuestions = [];
+        let currentStep = 0;
+        let answers = {};
+
+        function fetchSecurityQuestions() {
+            fetch('get_security_questions.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        securityQuestions = data.questions;
+                        currentStep = 0;
+                        answers = {};
+                        showSecurityQuestion(currentStep);
+                    } else {
+                        alert('Failed to load security questions.');
+                    }
+                })
+                .catch(() => alert('Error fetching security questions.'));
+        }
+
+        function showSecurityQuestion(index) {
+            const form = document.getElementById('send-money-form');
+            form.innerHTML = '';
+            if (index < securityQuestions.length) {
+                const q = securityQuestions[index];
+                const questionLabel = document.createElement('label');
+                questionLabel.textContent = q.question;
+                questionLabel.setAttribute('for', 'answer');
+                const answerInput = document.createElement('input');
+                answerInput.type = 'text';
+                answerInput.id = 'answer';
+                answerInput.name = 'answer';
+                answerInput.required = true;
+                answerInput.autocomplete = 'off';
+
+                const nextButton = document.createElement('button');
+                nextButton.type = 'button';
+                nextButton.textContent = `Answer Question ${index + 1} of ${securityQuestions.length}`;
+                nextButton.onclick = () => {
+                    const ans = answerInput.value.trim();
+                    if (!ans) {
+                        alert('Please provide an answer.');
+                        return;
+                    }
+                    answers[q.id] = ans;
+                    currentStep++;
+                    showSecurityQuestion(currentStep);
+                };
+
+                form.appendChild(questionLabel);
+                form.appendChild(answerInput);
+                form.appendChild(nextButton);
+            } else {
+                // All questions answered, validate answers
+                const submitButton = document.createElement('button');
+                submitButton.type = 'button';
+                submitButton.textContent = 'Validate Answers';
+                submitButton.onclick = validateAnswers;
+                form.appendChild(submitButton);
+            }
+        }
+
+        function validateAnswers() {
+            fetch('validate_security_questions.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answers })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Security validation successful! Money sent.');
+                    document.getElementById('send-money-form').reset();
+                    // Optionally redirect or reset form to initial state
+                    location.reload();
+                } else {
+                    alert('Security validation failed: ' + data.message);
+                    // Optionally restart questions
+                    fetchSecurityQuestions();
+                }
+            })
+            .catch(() => alert('Error validating security answers.'));
+        }
+
+        function sendMoney(event) {
+            event.preventDefault();
+            const recipient = document.getElementById('recipient').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            if (!recipient || !amount || isNaN(amount) || Number(amount) <= 0) {
+                alert('Please enter a valid recipient and amount.');
+                return;
+            }
+            // Hide initial form inputs and start security questions
+            fetchSecurityQuestions();
+        }
+
+        window.onload = function() {
+            const username = localStorage.getItem('username') || 'Guest';
+            document.getElementById('username-display').innerText = username;
+            updateTime();
+        };
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            <span id="username-display">Username</span>
+        </div>
+        <div class="time" id="time">--:--:-- --/--/----</div>
+    </div>
+    <main>
+        <form id="send-money-form" onsubmit="sendMoney(event)">
+            <h1><i class="fas fa-paper-plane"></i> Send Money</h1>
+            <label for="recipient">Recipient Account Number</label>
+            <input type="text" id="recipient" name="recipient" placeholder="Enter recipient account number" required />
+            <label for="amount">Amount ($)</label>
+            <input type="number" id="amount" name="amount" placeholder="Enter amount to send" required min="0.01" step="0.01" />
+            <button type="submit">Send</button>
+        </form>
+    </main>
+</body>
+</html>
